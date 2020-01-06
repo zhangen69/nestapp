@@ -1,3 +1,4 @@
+import { DemoComponent } from './shared/demo/demo.component';
 import { SharedModule } from './shared/shared.module';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgModule } from '@angular/core';
