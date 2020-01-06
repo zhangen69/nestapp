@@ -1,0 +1,942 @@
+<span class="mat-display-1">View Event Plan <span *ngIf="eventPlan && eventPlan.code">({{ eventPlan.code }} -
+    {{ eventPlan.name }})</span>
+</span>
+
+<mat-tab-group [selectedIndex]="selectedTabIndex" (selectedTabChange)="onTabChange($event.index)" *ngIf="eventPlan._id">
+  <!-- Tab1: Basis Info -->
+  <mat-tab label="Basis Info">
+    <div class="tab-body">
+      <div class="view-field">
+        <label class="mat-body-strong">Customer</label>
+        <div class="mat-body">
+          <a [routerLink]="['/customer/view/' + eventPlan.customer._id]">{{ eventPlan.customer?.name }}</a>
+        </div>
+      </div>
+      <div class="view-field">
+        <label class="mat-body-strong">Date & Time</label>
+        <div class="mat-body">{{ eventPlan.dateFrom | date: 'dd-MM-yyyy' }} -
+          {{ eventPlan.dateTo | date: 'dd-MM-yyyy' }}</div>
+        <div class="mat-body">{{ eventPlan.timeFrom | date: 'HH:mm a' }} - {{ eventPlan.timeTo | date: 'HH:mm a' }}
+        </div>
+      </div>
+      <div class="view-field">
+        <label class="mat-body-strong">Venue</label>
+        <div class="mat-body">{{ eventPlan.venue }}</div>
+      </div>
+      <div class="view-field">
+        <label class="mat-body-strong">Status</label>
+        <div class="mat-body">{{ eventPlan.status }}</div>
+      </div>
+      <div class="view-field">
+        <label class="mat-body-strong">Markup Rate (%)</label>
+        <div class="mat-body">{{ (eventPlan.markupRate || 0) | number: '1.0-2' }}%</div>
+      </div>
+      <div class="view-field" *ngIf="eventPlan.remarks">
+        <label class="mat-body-strong">Remarks</label>
+        <div class="mat-body">{{ eventPlan.remarks }}</div>
+      </div>
+      <div class="action-group">
+        <button class="btn-sm" routerLink="/event-plan/edit/{{eventPlan._id}}" mat-raised-button
+          color="primary">Edit</button>
+      </div>
+    </div>
+  </mat-tab>
+  <!-- Tab2: Resources -->
+  <mat-tab label="Resources">
+    <div class="tab-body">
+      <!-- Section1: Services -->
+      <div class="mat-subheading-1">Services
+        <button mat-icon-button color="primary" (click)="addItemToEvent('providerService', 'services')">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+      <div class="mat-body" *ngIf="eventPlan.services && eventPlan.services.length === 0">
+        No service yet.
+      </div>
+      <ng-container *ngIf="eventPlan.services && eventPlan.services.length > 0">
+        <div *ngFor="let service of eventPlan.services">
+          <div class="mat-body">
+            {{ service?.name }} x {{ service?.quantity }}
+            {{ service?.unit }}
+            ({{ service?.unitPrice | currency: 'RM' }} x {{ service?.quantity }} =
+            {{ service?.unitPrice * service?.quantity | currency: 'RM' }})
+          </div>
+          <div class="mat-small remarks" *ngIf="service.remarks">{{ service.remarks }}</div>
+        </div>
+      </ng-container>
+      <!-- Section2: Facilities -->
+      <div class="mat-subheading-1">Facilities
+        <button mat-icon-button color="primary" (click)="addItemToEvent('providerFacility', 'facilities')">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+      <div class="mat-body" *ngIf="eventPlan.facilities && eventPlan.facilities.length === 0">
+        No facility yet.
+      </div>
+      <ng-container *ngIf="eventPlan.facilities && eventPlan.facilities.length > 0">
+        <div *ngFor="let facility of eventPlan.facilities">
+          <div class="mat-body">
+            {{ facility?.name }} x {{ facility?.quantity }}
+            {{ facility?.unit }}
+            <!-- ({{ facility?.unitPrice * facility?.quantity | currency: 'RM' }}) -->
+            ({{ facility?.unitPrice | currency: 'RM' }} x {{ facility?.quantity }} =
+            {{ facility?.unitPrice * facility?.quantity | currency: 'RM' }})
+          </div>
+          <div class="mat-small remarks" *ngIf="facility.remarks">{{ facility.remarks }}</div>
+        </div>
+      </ng-container>
+      <!-- Section3: Stock Items -->
+      <div class="mat-subheading-1">Stock Items
+        <button mat-icon-button color="primary" (click)="addItemToEvent('stockItem', 'stockItems')">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+      <div class="mat-body" *ngIf="eventPlan.stockItems && eventPlan.stockItems.length === 0">
+        No stock item yet.
+      </div>
+      <ng-container *ngIf="eventPlan.stockItems && eventPlan.stockItems.length > 0">
+        <div *ngFor="let stockItem of eventPlan.stockItems">
+          <div class="mat-body">
+            {{ stockItem?.name }} x {{ stockItem?.quantity }}
+            {{ stockItem?.unit }}
+            <!-- ({{ stockItem?.unitPrice * stockItem?.quantity | currency: 'RM' }}) -->
+            ({{ stockItem?.unitPrice | currency: 'RM' }} x {{ stockItem?.quantity }} =
+            {{ stockItem?.unitPrice * stockItem?.quantity | currency: 'RM' }})
+          </div>
+          <div class="mat-small remarks" *ngIf="stockItem.remarks">{{ stockItem.remarks }}</div>
+        </div>
+      </ng-container>
+    </div>
+  </mat-tab>
+  <!-- Tab3: Processes -->
+  <mat-tab label="Processes">
+    <div class="tab-body">
+      <!-- <div cdkDropList (cdkDropListDropped)="dropDemo(demoList, $event)">
+          <div cdkDrag *ngFor="let item of demoList | processesFilter: 'Initial'">{{ item.name }}</div>
+      </div>
+      <pre>{{ eventPlan.processes | json }}</pre> -->
+      <div class="mat-subheading-1">Processes
+        <button mat-icon-button class="process-btn-group" color="primary" (click)="addEventProcessToEvent()">
+          <mat-icon>edit</mat-icon>
+        </button>
+      </div>
+      <mat-tab-group>
+        <mat-tab *ngFor="let status of eventPlanStatus;let i = index" [label]="status">
+          <div class="mat-body" *ngIf="eventPlan.processes && eventPlan.processes.length === 0; else eventProcesses">
+            No process yet.
+          </div>
+          <ng-template #eventProcesses>
+            <div class="btn-group" fxLayout="row">
+              <button mat-stroked-button class="btn-sm" type="button" [ngClass]="{'active': !selectProcessStatus}"
+                (click)="filterProcesses()">All</button>
+              <button mat-stroked-button class="btn-sm" type="button"
+                [ngClass]="{'active': selectProcessStatus === 'Open'}" (click)="filterProcesses('Open')">Open</button>
+              <button mat-stroked-button class="btn-sm" type="button"
+                [ngClass]="{'active': selectProcessStatus === 'In Progress'}"
+                (click)="filterProcesses('In Progress')">In
+                Progress</button>
+              <button mat-stroked-button class="btn-sm" type="button"
+                [ngClass]="{'active': selectProcessStatus === 'Done'}" (click)="filterProcesses('Done')">Done</button>
+              <button mat-stroked-button class="btn-sm" type="button"
+                [ngClass]="{'active': selectProcessStatus === 'Verified'}"
+                (click)="filterProcesses('Verified')">Verified</button>
+              <button mat-stroked-button class="btn-sm" type="button"
+                [ngClass]="{'active': selectProcessStatus === 'Closed'}"
+                (click)="filterProcesses('Closed')">Closed</button>
+              <button mat-stroked-button class="btn-sm" type="button"
+                [ngClass]="{'active': selectProcessStatus === 'Cancelled'}"
+                (click)="filterProcesses('Cancelled')">Cancelled</button>
+            </div>
+            <!-- <pre>{{ filteredEventProcesses | json }}</pre> -->
+            <div cdkDropList class="example-list" (cdkDropListDropped)="drop($event)">
+              <!-- <div class="example-box" *ngFor="let movie of filteredEventProcesses" cdkDrag>{{movie}}</div> -->
+              <div class="process-item" cdkDrag
+                *ngFor="let process of eventPlan.processes; let i = index; let l = count">
+                <mat-card class="mat-elevation-z4" *ngIf="process.type === status">
+                  <!-- <div *ngIf="!selectProcessStatus">
+                    <button mat-button (click)="onMoveDownPosition(process, i)" *ngIf="i !== l-1">
+                      <mat-icon>keyboard_arrow_down</mat-icon>
+                    </button>
+                    <button mat-button (click)="onMoveUpPosition(process, i)" *ngIf="i !== 0">
+                      <mat-icon>keyboard_arrow_up</mat-icon>
+                    </button>
+                  </div> -->
+                  <div class="mat-body-strong">
+                    {{ getDuration(process) }} <i>{{ process.type }}</i>
+                  </div>
+                  <div class="mat-body-strong">{{ process.type }}:{{ process.name }}</div>
+                  <div class="mat-small">{{ process?.provider?.name }}</div>
+                  <pre fxLayout="column">
+                    <span>Status: {{ process.status }}</span>
+                    <div class="btn-group" fxLayout="row">
+                        <button mat-stroked-button class="btn-sm" type="button" (click)="changeProcessStatus(process, 'In Progress')" *ngIf="process.status === 'Open'">Proceed</button>
+                        <button mat-stroked-button class="btn-sm" type="button" (click)="changeProcessStatus(process, 'Done')" *ngIf="process.status === 'In Progress'">Done</button>
+                        <button mat-stroked-button class="btn-sm" type="button" (click)="changeProcessStatus(process, 'Verified')" *ngIf="process.status === 'Done'">Verify</button>
+                        <button mat-stroked-button class="btn-sm" type="button" (click)="changeProcessStatus(process, 'Closed')" *ngIf="process.status === 'Done' || process.status === 'Verified'">Close</button>
+                        <button mat-stroked-button class="btn-sm" type="button" (click)="changeProcessStatus(process, 'Cancelled')" *ngIf="process.status === 'Open'">Cancel</button>
+                    </div>
+                  </pre>
+                  <div class="mat-body" *ngIf="process.remarks">{{ process.remarks }}</div>
+                </mat-card>
+              </div>
+            </div>
+            <div class="mat-body" *ngIf="(filteredEventProcesses | processesFilter: status).length === 0">
+              <p>No process yet.</p>
+            </div>
+          </ng-template>
+        </mat-tab>
+      </mat-tab-group>
+    </div>
+  </mat-tab>
+  <!-- Tab4: Form -->
+  <mat-tab label="Form">
+    <div class="tab-body">
+      <div [ngTemplateOutlet]="eventPlan.registrationForm ? showFormInfo : noFormMessage"></div>
+      <!-- <div class="qrcode-scanner-wrapper qr-scan-area">
+          <zxing-scanner
+          #scanner
+          [(device)]="currentDevice"
+          (scanSuccess)="onCodeResult($event)"
+          (permissionResponse)="onHasPermission($event)"
+        ></zxing-scanner>
+        <div class="qr-area">
+            <div class="area"></div>
+          </div>
+      </div> -->
+      <ng-template #noFormMessage>
+        <p>No form yet, <button mat-button class="btn-link" color="primary"
+            (click)="configForm(eventPlan)">click</button> here config form</p>
+      </ng-template>
+      <ng-template #showFormInfo>
+        <div class="mat-title">Preview Form
+          <button mat-icon-button class="process-btn-group" color="primary" (click)="configForm(eventPlan)">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+
+        <div class="action-group">
+          <a class="btn-sm" [routerLink]="['/register/' + eventPlan._id]" target="_blank" mat-raised-button>
+            <mat-icon>public</mat-icon> Publish
+          </a>
+          <button class="btn-sm" mat-raised-button (click)="copyRegistrationFormLink(eventPlan._id)"
+            value="click to copy">
+            <mat-icon>link</mat-icon> Copy Link
+          </button>
+          <button class="btn-sm" mat-raised-button (click)="sendRegistrationFormLink(eventPlan._id)"
+            value="click to send">
+            <mat-icon>send</mat-icon> Send Link
+          </button>
+        </div>
+
+        <div class="form">
+          <mat-card class="card-md">
+            <mat-card-header>
+              <mat-card-title>{{ eventPlan.registrationForm.title }}</mat-card-title>
+              <mat-card-subtitle>
+                <app-standard-display-field [field]="{ name: 'description', noLabel: true }"
+                  [formData]="eventPlan.registrationForm">
+                </app-standard-display-field>
+              </mat-card-subtitle>
+              <mat-card-subtitle>Please fill-in all the required fields marked with asterisks (*).</mat-card-subtitle>
+            </mat-card-header>
+            <mat-card-content>
+              <mat-expansion-panel expanded>
+                <mat-expansion-panel-header class="bg-primary">
+                  <mat-panel-title>
+                    <h4>Basic Information</h4>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <app-standard-form-field [field]="{ name: 'name', type: 'string', required: true }"
+                  *ngIf="eventPlan.registrationForm?.settings.name"></app-standard-form-field>
+                <app-standard-form-field [field]="{ name: 'gender', type: 'string', required: true }"
+                  *ngIf="eventPlan.registrationForm?.settings.gender"></app-standard-form-field>
+                <app-standard-form-field [field]="{ name: 'identityNumber', type: 'string', required: true }"
+                  *ngIf="eventPlan.registrationForm?.settings.identityNumber"></app-standard-form-field>
+                <app-standard-form-field [field]="{ name: 'email', type: 'string', required: true }"
+                  *ngIf="eventPlan.registrationForm?.settings.email"></app-standard-form-field>
+                <app-standard-form-field [field]="{ name: 'phoneNumber', type: 'string', required: true }"
+                  *ngIf="eventPlan.registrationForm?.settings.phoneNumber"></app-standard-form-field>
+                <app-standard-form-field [field]="{ name: 'organization', type: 'string', required: true }"
+                  *ngIf="eventPlan.registrationForm?.settings.organization"></app-standard-form-field>
+                <app-standard-form-field [field]="{ name: 'address', type: 'textarea', required: true }"
+                  *ngIf="eventPlan.registrationForm?.settings.address"></app-standard-form-field>
+              </mat-expansion-panel>
+
+              <mat-expansion-panel expanded *ngIf="eventPlan.registrationForm?.fields.length > 0">
+                <mat-expansion-panel-header class="bg-primary">
+                  <mat-panel-title>
+                    <h4>Detail Information</h4>
+                  </mat-panel-title>
+                </mat-expansion-panel-header>
+
+                <div *ngFor="let field of eventPlan.registrationForm?.fields">
+                  <app-standard-form-field [field]="field"></app-standard-form-field>
+                </div>
+              </mat-expansion-panel>
+            </mat-card-content>
+            <mat-card-actions>
+              <button mat-raised-button color="primary" type="button">
+                <mat-icon>done</mat-icon> Register Now
+              </button>
+            </mat-card-actions>
+          </mat-card>
+        </div>
+      </ng-template>
+    </div>
+  </mat-tab>
+  <mat-tab label="Attendees">
+    <div class="tab-body">
+      <button mat-button class="process-btn-group" color="primary" (click)="addAttendee()">
+        <mat-icon>add</mat-icon> Attendees
+      </button>
+      <div class="filter-wrapper">
+        <mat-form-field class="example-full-width">
+          <input matInput placeholder="Enter keyword" type="text" [(ngModel)]="attendeeQueryModel.searchText"
+            (keyup.enter)="filterAttendees(eventPlan.attendees, attendeeQueryModel)">
+        </mat-form-field>
+
+        <mat-form-field>
+          <mat-label>Type</mat-label>
+          <mat-select [(ngModel)]="attendeeQueryModel.type">
+            <mat-option value="{{ option }}" *ngFor="let option of attendeeQueryModel.typeOptions">
+              {{option | titleDisplay }}</mat-option>
+            <mat-option value="group">Group</mat-option>
+          </mat-select>
+        </mat-form-field>
+
+        <button mat-raised-button color="primary" type="button" class="btn-sm"
+          (click)="filterAttendees(eventPlan.attendees, attendeeQueryModel)">Search</button>
+      </div>
+      <div class="action-group">
+        <button mat-raised-button class="btn-sm" color="primary" (click)="groupAttendees()"
+          *ngIf="hasAttendeeIsSelected(eventPlan.attendees)">
+          Group Attendees
+        </button>
+        <a mat-raised-button class="btn-end" color="primary" href="assets/import attendee list.xlsx" download>
+          <mat-icon>cloud_download</mat-icon> Template
+        </a>
+        <button mat-raised-button color="primary" (click)="importAttendees()">
+          <mat-icon>import_export</mat-icon> Import
+        </button>
+        <button mat-raised-button color="primary" (click)="exportAttendees()">
+          <mat-icon>import_export</mat-icon> Export
+        </button>
+        <button mat-raised-button color="primary" (click)="getAttendees()">
+          <mat-icon>refresh</mat-icon> Refresh
+        </button>
+      </div>
+      <div [ngTemplateOutlet]="eventPlan.attendees && eventPlan.attendees.length > 0 ? attendeeList : noFoundAttendees">
+      </div>
+      <ng-template #attendeeList>
+        <table class="table table-bordered" #attendeeTable>
+          <thead>
+            <tr>
+              <th>
+                <mat-checkbox [(ngModel)]="isSelectedAllAttendee"
+                  (change)="selectAllAttendee(attendeeQueryModel.list, isSelectedAllAttendee)"></mat-checkbox>
+              </th>
+              <th>Code</th>
+              <th *ngFor="let setting of eventPlan.registrationForm.settings | toArray | filterOptions: true: 'value'">
+                {{ setting.key | titleDisplay }}</th>
+              <th *ngFor="let field of eventPlan.registrationForm.fields">{{ field.displayName }}</th>
+              <th>Group</th>
+              <th>Action</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let attendee of attendeeQueryModel.list">
+              <td>
+                <mat-checkbox [(ngModel)]="attendee.isSelected"
+                  (change)="checkIsAllAttendeeSelected(attendeeQueryModel.list)"></mat-checkbox>
+              </td>
+              <td>{{ attendee.code }}</td>
+              <td *ngFor="let setting of eventPlan.registrationForm.settings | toArray | filterOptions: true: 'value'">
+                {{ attendee[setting.key] }}</td>
+              <td *ngFor="let field of eventPlan.registrationForm.fields">
+                <div *ngIf="attendee.formData && attendee.formData[field.name]">{{ attendee.formData[field.name] }}
+                </div>
+              </td>
+              <td>{{ attendee.group }}</td>
+              <td>
+                <button mat-raised-button class="btn-sm" color="primary" (click)="editAttendee(attendee)">
+                  <mat-icon>edit</mat-icon> Edit
+                </button>
+                <button mat-button class="btn-sm" (click)="removeAttendee(attendee)">
+                  <mat-icon>delete</mat-icon> Remove
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+        <!-- <pre>{{ eventPlan.attendees | json }}</pre> -->
+      </ng-template>
+      <ng-template #noFoundAttendees>
+        <p>No attendee yet.</p>
+      </ng-template>
+    </div>
+  </mat-tab>
+  <!-- Tab for Related Quotation -->
+  <mat-tab label="Quotation">
+    <div class="tab-body">
+      <div [ngTemplateOutlet]="quotation ? showQuotationInfo : noQuotationMessage"></div>
+      <ng-template #noQuotationMessage>
+        <p>No Quotation Yet, Please create a quotation for this event plan.</p>
+        <p>Click <a [routerLink]="['/quotation/add']"
+            [queryParams]="{ eventPlan: eventPlan._id, customer: eventPlan.customer?._id, callback: '/event-plan/view/' + this.eventPlan._id, fragment: '5' }">here</a>
+          redirect to
+          new quotation form page.</p>
+      </ng-template>
+      <ng-template #showQuotationInfo>
+        <div class="mat-title">Quotation ({{ quotation.code }})</div>
+        <div class="view-field">
+          <label class="mat-body-strong">Customer</label>
+          <div class="mat-body">
+            <a [routerLink]="['/customer/view/' + quotation.customer._id]">{{ quotation.customer.name }}</a>
+          </div>
+        </div>
+        <div class="view-field">
+          <label class="mat-body-strong">Total Amount</label>
+          <div class="mat-body">{{ getLinesTotalAmount(quotation.lines, true) | currency: 'MYR ' }}</div>
+        </div>
+        <div class="view-field">
+          <label class="mat-body-strong">Status</label>
+          <div class="mat-body">{{ quotation.status }}</div>
+        </div>
+        <div class="action-group" *ngIf="quotation.status !== 'Closed'">
+          <button class="btn-sm" (click)="changeItemStatus(quotation, 'quotation', 'Issued')" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(quotation, ['Open', 'Revised'])">Issue</button>
+          <button class="btn-sm" (click)="changeItemStatus(quotation, 'quotation', 'Confirmed')" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(quotation, ['Issued'])">Confirm</button>
+          <button class="btn-sm" (click)="changeItemStatus(quotation, 'quotation', 'Cancelled')" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(quotation, ['Open', 'Revised'])">Cancel</button>
+          <button class="btn-sm" (click)="changeItemStatus(quotation, 'quotation', 'Revised')" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(quotation, ['Issued'])">Revise</button>
+          <button class="btn-sm" (click)="changeItemStatus(quotation, 'quotation', 'Closed')" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(quotation, ['Confirmed'])">Close</button>
+        </div>
+        <div class="view-field" *ngIf="quotation.remarks">
+          <label class="mat-body-strong">Remarks</label>
+          <div class="mat-body">{{ quotation.remarks }}</div>
+        </div>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Unit</th>
+              <th>Unit Price</th>
+              <th>Quantity</th>
+              <th>Sub Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let line of quotation.lines">
+              <td>{{ line.name }}</td>
+              <td>{{ line.unit }}</td>
+              <td>{{ line.unitPrice | currency: 'MYR ' }}</td>
+              <td>{{ line.quantity }}</td>
+              <td>{{ (line.quantity * line.unitPrice) | currency: 'MYR ' }}</td>
+            </tr>
+            <tr>
+              <td>Markup Amount</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>{{ getLinesTotalAmount(quotation.lines) * (eventPlan.markupRate / 100) | currency: 'MYR ' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="action-group">
+          <button class="btn-sm" routerLink="/quotation/edit/{{quotation._id}}"
+            [queryParams]="{ callback: '/event-plan/view/' + this.eventPlan._id, fragment: '5' }" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(quotation, ['Open', 'Revised'])">Edit</button>
+          <button class="btn-sm" mat-raised-button color="primary" (click)="generateInvoiceFromQuotation(quotation)"
+            *ngIf="checkButtonIsValid(quotation, ['Closed', 'Confirmed']) && invoice === null">Generate Final
+            Invoice</button>
+        </div>
+        <!-- <pre>{{ quotation | json }}</pre> -->
+      </ng-template>
+    </div>
+  </mat-tab>
+  <!-- Tab for Invoice (to Customer) -->
+  <mat-tab label="Invoice">
+    <div class="tab-body">
+      <div [ngTemplateOutlet]="invoice ? showInvoiceInfo : noInvoiceMessage"></div>
+      <ng-template #noInvoiceMessage>
+        <p>No Invoice Yet, Please create an invoice for this event plan.</p>
+        <p>Click <a [routerLink]="['/invoice/add']"
+            [queryParams]="{ eventPlan: eventPlan._id, customer: eventPlan.customer?._id, callback: '/event-plan/view/' + this.eventPlan._id, fragment: '6' }">here</a>
+          redirect to
+          new invoice form page.</p>
+      </ng-template>
+      <ng-template #showInvoiceInfo>
+        <div class="mat-title">Invoice ({{ invoice.code }})</div>
+        <div class="view-field">
+          <label class="mat-body-strong">Customer</label>
+          <div class="mat-body">
+            <a [routerLink]="['/customer/view/' + invoice.customer._id]">{{ invoice.customer.name }}</a>
+          </div>
+        </div>
+        <div class="view-field">
+          <label class="mat-body-strong">Total Amount</label>
+          <div class="mat-body">{{ getLinesTotalAmount(invoice.lines, true) | currency: 'MYR ' }}</div>
+        </div>
+        <div class="view-field">
+          <label class="mat-body-strong">Outstanding Balance</label>
+          <div class="mat-body">{{ getOutsandingBalance('Customer', invoice) | currency: 'MYR ' }}</div>
+        </div>
+        <div class="view-field">
+          <label class="mat-body-strong">Status</label>
+          <div class="mat-body">{{ invoice.status }}</div>
+        </div>
+        <div class="action-group" *ngIf="invoice.status !== 'Closed'">
+          <button class="btn-sm" (click)="changeItemStatus(invoice, 'invoice', 'Issued')" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(invoice, ['Open'])">Issue</button>
+          <button class="btn-sm" (click)="changeItemStatus(invoice, 'invoice', 'Confirmed')" mat-raised-button
+            color="primary"
+            *ngIf="checkButtonIsValid(invoice, ['Issued']) && getOutsandingBalance('Customer', invoice) !== getLinesTotalAmount(invoice.lines, true)">Confirm</button>
+          <button class="btn-sm" (click)="changeItemStatus(invoice, 'invoice', 'Cancelled')" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(invoice, ['Open'])">Cancel</button>
+          <button class="btn-sm" (click)="changeItemStatus(invoice, 'invoice', 'Paid')" mat-raised-button
+            color="primary"
+            *ngIf="checkButtonIsValid(invoice, ['Confirmed']) && getOutsandingBalance('Customer', invoice) === 0">Pay</button>
+          <button class="btn-sm" (click)="changeItemStatus(invoice, 'invoice', 'Closed')" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(invoice, ['Paid'])">Close</button>
+        </div>
+        <div class="view-field" *ngIf="invoice.remarks">
+          <label class="mat-body-strong">Remarks</label>
+          <div class="mat-body">{{ invoice.remarks }}</div>
+        </div>
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Unit</th>
+              <th>Unit Price</th>
+              <th>Quantity</th>
+              <th>Sub Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let line of invoice.lines">
+              <td>{{ line.name }}</td>
+              <td>{{ line.unit }}</td>
+              <td>{{ line.unitPrice | currency: 'MYR ' }}</td>
+              <td>{{ line.quantity }}</td>
+              <td>{{ (line.quantity * line.unitPrice) | currency: 'MYR ' }}</td>
+            </tr>
+            <tr>
+              <td>Markup Amount</td>
+              <td></td>
+              <td></td>
+              <td></td>
+              <td>{{ getLinesTotalAmount(invoice.lines) * (eventPlan.markupRate / 100) | currency: 'MYR ' }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <div class="action-group">
+          <button class="btn-sm" routerLink="/invoice/edit/{{invoice._id}}"
+            [queryParams]="{ callback: '/event-plan/view/' + this.eventPlan._id, fragment: '6' }" mat-raised-button
+            color="primary" *ngIf="checkButtonIsValid(invoice, ['Open'])">Edit</button>
+          <button mat-raised-button color="primary" class="btn-sm" [routerLink]="['/payment/add/']"
+            [queryParams]="{ eventPlan: eventPlan._id, customer: invoice.customer._id, invoice: invoice._id, amount: getOutsandingBalance('Customer', invoice), remarks: 'Deposit', callback: '/event-plan/view/' + this.eventPlan._id, fragment: '9' }"
+            *ngIf="checkButtonIsValid(invoice, ['Issued']) && getOutsandingBalance('Customer', invoice) === getLinesTotalAmount(invoice.lines, true)">Generate
+            Deposit</button>
+          <button mat-raised-button color="primary" class="btn-sm" [routerLink]="['/payment/add/']"
+            [queryParams]="{ eventPlan: eventPlan._id, customer: invoice.customer._id, invoice: invoice._id, amount: getOutsandingBalance('Customer', invoice), callback: '/event-plan/view/' + this.eventPlan._id, fragment: '9' }"
+            *ngIf="checkButtonIsValid(invoice, ['Confirmed']) && getOutsandingBalance('Customer', invoice) !== 0">Generate
+            Payment</button>
+        </div>
+        <!-- <pre>{{ invoice | json }}</pre> -->
+      </ng-template>
+    </div>
+  </mat-tab>
+  <!-- Tab for Related Supplier Invoices -->
+  <mat-tab label="Supplier Invoices">
+    <div class="tab-body">
+      <button mat-raised-button color="primary" type="button" class="btn-sm" [routerLink]="['/supplier-invoice/add']"
+        [queryParams]="{ eventPlan: eventPlan._id, callback: '/event-plan/view/' + eventPlan._id, fragment: '7' }">Add
+        New Supplier Invoice</button>
+      <div class="supplier-invoice-wrapper" fxLayout="row skretch" fxLayoutGap="0.5%" fxAlignColumns="start stretch">
+        <mat-card *ngFor="let supplierInvoice of supplierInvoices">
+          <mat-card-header>
+            <mat-card-title>{{ supplierInvoice.code }}</mat-card-title>
+          </mat-card-header>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <div class="view-field">
+              <label class="mat-body-strong">Provider</label>
+              <div class="mat-body">
+                <a
+                  [routerLink]="['/provider/view/' + supplierInvoice.provider._id]">{{ supplierInvoice.provider.name }}</a>
+              </div>
+            </div>
+            <div class="view-field">
+              <label class="mat-body-strong">Reference Number</label>
+              <div class="mat-body">{{ supplierInvoice.referenceNumber }}</div>
+            </div>
+            <div class="view-field">
+              <label class="mat-body-strong">Total Amount</label>
+              <div class="mat-body">{{ getLinesTotalAmount(supplierInvoice.lines) | currency: 'MYR ' }}</div>
+            </div>
+            <div class="view-field">
+              <label class="mat-body-strong">Outstanding Balance</label>
+              <div class="mat-body">{{ getOutsandingBalance('Provider', supplierInvoice) | currency: 'MYR ' }}</div>
+            </div>
+            <div class="view-field">
+              <label class="mat-body-strong">Status</label>
+              <div class="mat-body">{{ supplierInvoice.status }}</div>
+            </div>
+            <div class="action-group" *ngIf="supplierInvoice.status !== 'Closed'">
+              <button class="btn-sm" (click)="changeItemStatus(supplierInvoice, 'supplier-invoice', 'Confirmed')"
+                mat-raised-button color="primary" *ngIf="checkButtonIsValid(supplierInvoice, ['Open'])">Confirm</button>
+              <button class="btn-sm" (click)="changeItemStatus(supplierInvoice, 'supplier-invoice', 'Paid')"
+                mat-raised-button color="primary"
+                *ngIf="checkButtonIsValid(supplierInvoice, ['Confirmed']) && getOutsandingBalance('Provider', supplierInvoice) === 0">Pay</button>
+              <button class="btn-sm" (click)="changeItemStatus(supplierInvoice, 'supplier-invoice', 'Cancelled')"
+                mat-raised-button color="primary" *ngIf="checkButtonIsValid(supplierInvoice, ['Open'])">Cancel</button>
+              <button class="btn-sm" (click)="changeItemStatus(supplierInvoice, 'supplier-invoice', 'Closed')"
+                mat-raised-button color="primary" *ngIf="checkButtonIsValid(supplierInvoice, ['Paid'])">Close</button>
+            </div>
+            <div class="view-field">
+              <label class="mat-body-strong">Period</label>
+              <div class="mat-body">{{ supplierInvoice.period | titleDisplay }}</div>
+            </div>
+            <div class="view-field" *ngIf="supplierInvoice.remarks">
+              <label class="mat-body-strong">Remarks</label>
+              <div class="mat-body">{{ supplierInvoice.remarks }}</div>
+            </div>
+            <table class="table table-bordered supplier-invoices">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Unit</th>
+                  <th>Unit Price</th>
+                  <th>Quantity</th>
+                  <th>Sub Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let line of supplierInvoice.lines">
+                  <td>{{ line.name }}</td>
+                  <td>{{ line.unit }}</td>
+                  <td>{{ line.unitPrice }}</td>
+                  <td>{{ line.quantity }}</td>
+                  <td>{{ (line.unitPrice * line.quantity) | currency: 'MYR ' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </mat-card-content>
+          <mat-divider></mat-divider>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" class="btn-sm"
+              [routerLink]="['/supplier-invoice/edit/' + supplierInvoice._id]"
+              [queryParams]="{ callback: '/event-plan/view/' + eventPlan._id, fragment: '7' }"
+              *ngIf="checkButtonIsValid(supplierInvoice, ['Open'])">Edit</button>
+            <button mat-raised-button color="primary" class="btn-sm" [routerLink]="['/payment/add/']"
+              [queryParams]="{ eventPlan: eventPlan._id, provider: supplierInvoice.provider._id, supplierInvoice: supplierInvoice._id, amount: getOutsandingBalance('Provider', supplierInvoice), callback: '/event-plan/view/' + this.eventPlan._id, fragment: '9' }"
+              *ngIf="checkButtonIsValid(supplierInvoice, ['Confirmed']) && getOutsandingBalance('Provider', supplierInvoice) !== 0">Generate
+              Payment</button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+      <!-- <pre>{{ supplierInvoices | json }}</pre> -->
+    </div>
+  </mat-tab>
+  <!-- Tab for Related Payment Vouchers -->
+  <mat-tab label="Payment Voucher">
+    <div class="tab-body">
+      <button mat-raised-button color="primary" type="button" class="btn-sm" [routerLink]="['/payment-voucher/add']"
+        [queryParams]="{ eventPlan: eventPlan._id, callback: '/event-plan/view/' + eventPlan._id, fragment: '8' }">Add
+        New Payment Voucher</button>
+      <div class="payment-voucher-wrapper" fxLayout="row skretch" fxLayoutGap="0.5%" fxAlignColumns="start stretch">
+        <mat-card *ngFor="let paymentVoucher of paymentVouchers">
+          <mat-card-header>
+            <mat-card-title>{{ paymentVoucher.code }}</mat-card-title>
+          </mat-card-header>
+          <mat-divider></mat-divider>
+          <mat-card-content>
+            <div class="view-field">
+              <label class="mat-body-strong">Provider</label>
+              <div class="mat-body">
+                <a
+                  [routerLink]="['/provider/view/' + paymentVoucher.provider._id]">{{ paymentVoucher.provider.name }}</a>
+              </div>
+            </div>
+            <div class="view-field">
+              <label class="mat-body-strong">Total Amount</label>
+              <div class="mat-body">{{ getLinesTotalAmount(paymentVoucher.lines) | currency: 'MYR ' }}</div>
+            </div>
+            <div class="view-field">
+              <label class="mat-body-strong">Status</label>
+              <div class="mat-body">{{ paymentVoucher.status }}</div>
+            </div>
+            <div class="action-group" *ngIf="paymentVoucher.status !== 'Closed'">
+              <button class="btn-sm" (click)="changeItemStatus(paymentVoucher, 'payment-voucher', 'Issued')"
+                mat-raised-button color="primary" *ngIf="checkButtonIsValid(paymentVoucher, ['Open'])">Issue</button>
+              <button class="btn-sm" (click)="changeItemStatus(paymentVoucher, 'payment-voucher', 'Signed')"
+                mat-raised-button color="primary" *ngIf="checkButtonIsValid(paymentVoucher, ['Issued'])">Sign</button>
+              <button class="btn-sm" (click)="changeItemStatus(paymentVoucher, 'payment-voucher', 'Cancelled')"
+                mat-raised-button color="primary"
+                *ngIf="checkButtonIsValid(paymentVoucher, ['Open', 'Issued'])">Cancel</button>
+              <button class="btn-sm" (click)="changeItemStatus(paymentVoucher, 'payment-voucher', 'Closed')"
+                mat-raised-button color="primary" *ngIf="checkButtonIsValid(paymentVoucher, ['Signed'])">Close</button>
+            </div>
+            <div class="view-field">
+              <label class="mat-body-strong">Payment Type</label>
+              <div class="mat-body">{{ paymentVoucher.paymentType | titleDisplay }}</div>
+            </div>
+            <div *ngIf="paymentVoucher.paymentType === 'Cheque'">
+              <div class="view-field">
+                <label class="mat-body-strong">Reference No.</label>
+                <div class="mat-body">{{ paymentVoucher.chequeInfo.referenceNumber }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Payee</label>
+                <div class="mat-body">{{ paymentVoucher.chequeInfo.payeeName }}
+                  ({{ paymentVoucher.chequeInfo.payeeIdentityNumber }})</div>
+              </div>
+              <!-- <div class="view-field">
+                <label class="mat-body-strong">Drawee</label>
+                <div class="mat-body">{{ paymentVoucher.chequeInfo.draweeName }}
+                  ({{ paymentVoucher.chequeInfo.draweeIdentityNumber }})</div>
+              </div> -->
+              <div class="view-field">
+                <label class="mat-body-strong">Issued Date</label>
+                <div class="mat-body">{{ paymentVoucher.chequeInfo.issuedDate | date: 'dd-MM-yyyy' }}</div>
+              </div>
+            </div>
+            <div *ngIf="paymentVoucher.paymentType === 'BankTransfer'">
+              <div class="view-field">
+                <label class="mat-body-strong">Reference No.</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.referenceNumber }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Bank</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.bank }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Account Number</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.accountNumber }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Payee</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.payeeName }}
+                  ({{ paymentVoucher.bankTransferInfo.payeeIdentityNumber }})</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Transfered Date</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.transferedDate | date: 'dd-MM-yyyy' }}</div>
+              </div>
+            </div>
+            <div class="view-field" *ngIf="paymentVoucher.remarks">
+              <label class="mat-body-strong">Remarks</label>
+              <div class="mat-body">{{ paymentVoucher.remarks }}</div>
+            </div>
+            <table class="table table-bordered payment-vouchers">
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Unit</th>
+                  <th>Unit Price</th>
+                  <th>Quantity</th>
+                  <th>Sub Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let line of paymentVoucher.lines">
+                  <td>{{ line.name }}</td>
+                  <td>{{ line.unit }}</td>
+                  <td>{{ line.unitPrice }}</td>
+                  <td>{{ line.quantity }}</td>
+                  <td>{{ (line.unitPrice * line.quantity) | currency: 'MYR ' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </mat-card-content>
+          <mat-divider></mat-divider>
+          <mat-card-actions>
+            <button mat-raised-button color="primary" class="btn-sm"
+              [routerLink]="['/payment-voucher/edit/' + paymentVoucher._id]"
+              [queryParams]="{ callback: '/event-plan/view/' + eventPlan._id, fragment: '8' }"
+              *ngIf="checkButtonIsValid(paymentVoucher, ['Open'])">Edit</button>
+          </mat-card-actions>
+        </mat-card>
+      </div>
+      <!-- <pre>{{ paymentVouchers | json }}</pre> -->
+    </div>
+  </mat-tab>
+  <!-- Tab for Related Payments -->
+  <mat-tab label="Payments">
+    <div class="tab-body">
+      <button mat-raised-button color="primary" type="button" class="btn-sm" [routerLink]="['/payment/add']"
+        [queryParams]="{ eventPlan: eventPlan._id, callback: '/event-plan/view/' + eventPlan._id, fragment: '9' }">Add
+        New
+        Payment</button>
+      <div class="payment-wrapper">
+        <mat-tab-group>
+          <mat-tab label="Customer">
+            <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="0.5%" fxAlignColumns="start stretch">
+              <ng-container [ngTemplateOutlet]="paymentItem" [ngTemplateOutletContext]="{ data: payment }"
+                *ngFor="let payment of payments | filterOptions: 'Customer': 'type'"></ng-container>
+            </div>
+          </mat-tab>
+          <mat-tab label="Provider">
+            <div fxLayout="row wrap" fxLayout.xs="column" fxLayoutGap="0.5%" fxAlignColumns="start stretch">
+              <ng-container [ngTemplateOutlet]="paymentItem" [ngTemplateOutletContext]="{ data: payment }"
+                *ngFor="let payment of payments | filterOptions: 'Provider': 'type'"></ng-container>
+            </div>
+          </mat-tab>
+        </mat-tab-group>
+
+        <ng-template #paymentItem let-payment="data">
+          <mat-card>
+            <mat-card-header>
+              <mat-card-title>{{ payment.code }}</mat-card-title>
+            </mat-card-header>
+            <mat-divider></mat-divider>
+            <mat-card-content>
+              <div class="view-field" *ngIf="payment.provider">
+                <label class="mat-body-strong">Provider</label>
+                <div class="mat-body">
+                  <a [routerLink]="['/provider/view/' + payment.provider._id]">{{ payment.provider.name }}</a>
+                </div>
+              </div>
+              <div class="view-field" *ngIf="payment.customer">
+                <label class="mat-body-strong">Customer</label>
+                <div class="mat-body">{{ payment.customer.name }}</div>
+              </div>
+              <div class="view-field" *ngIf="payment.supplierInvoice">
+                <label class="mat-body-strong">Ref: Supplier Invoice</label>
+                <div class="mat-body">{{ payment.supplierInvoice.code }}</div>
+              </div>
+              <div class="view-field" *ngIf="payment.invoice">
+                <label class="mat-body-strong">Ref: Invoice</label>
+                <div class="mat-body">{{ payment.invoice.code }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Amount</label>
+                <div class="mat-body">{{ payment.amount | currency: 'MYR ' }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Status</label>
+                <div class="mat-body">{{ payment.status }}</div>
+              </div>
+              <div class="action-group" *ngIf="payment.status !== 'Closed'">
+                <button class="btn-sm" (click)="changeItemStatus(payment, 'payment', 'Verified')" mat-raised-button
+                  color="primary" *ngIf="checkButtonIsValid(payment, ['Open'])">Verify</button>
+                <button class="btn-sm" (click)="changeItemStatus(payment, 'payment', 'Failed')" mat-raised-button
+                  color="primary" *ngIf="checkButtonIsValid(payment, ['Open'])">Fail</button>
+                <button class="btn-sm" (click)="changeItemStatus(payment, 'payment', 'Cancelled')" mat-raised-button
+                  color="primary" *ngIf="checkButtonIsValid(payment, ['Open'])">Cancel</button>
+                <button class="btn-sm" (click)="changeItemStatus(payment, 'payment', 'Closed')" mat-raised-button
+                  color="primary" *ngIf="checkButtonIsValid(payment, ['Verified'])">Close</button>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Payment Type</label>
+                <div class="mat-body">{{ payment.paymentType | titleDisplay }}</div>
+              </div>
+              <div class="view-field" *ngIf="payment.remarks">
+                <label class="mat-body-strong">Remarks</label>
+                <div class="mat-body">{{ payment.remarks }}</div>
+              </div>
+              <div *ngIf="payment.paymentType === 'Cheque'">
+                <div class="view-field">
+                  <label class="mat-body-strong">Reference No.</label>
+                  <div class="mat-body">{{ payment.chequeInfo.referenceNumber }}</div>
+                </div>
+                <div class="view-field">
+                  <label class="mat-body-strong">Payee</label>
+                  <div class="mat-body">{{ payment.chequeInfo.payeeName }}
+                    ({{ payment.chequeInfo.payeeIdentityNumber }})
+                  </div>
+                </div>
+                <!-- <div class="view-field">
+                  <label class="mat-body-strong">Drawee</label>
+                  <div class="mat-body">{{ payment.chequeInfo.draweeName }}
+                    ({{ payment.chequeInfo.draweeIdentityNumber }})</div>
+                </div> -->
+                <div class="view-field">
+                  <label class="mat-body-strong">Issued Date</label>
+                  <div class="mat-body">{{ payment.chequeInfo.issuedDate | date: 'dd-MM-yyyy' }}</div>
+                </div>
+              </div>
+              <div *ngIf="payment.paymentType === 'BankTransfer'">
+                <div class="view-field">
+                  <label class="mat-body-strong">Reference No.</label>
+                  <div class="mat-body">{{ payment.bankTransferInfo.referenceNumber }}</div>
+                </div>
+                <div class="view-field">
+                  <label class="mat-body-strong">Bank</label>
+                  <div class="mat-body">{{ payment.bankTransferInfo.bank }}</div>
+                </div>
+                <div class="view-field">
+                  <label class="mat-body-strong">Account Number</label>
+                  <div class="mat-body">{{ payment.bankTransferInfo.accountNumber }}</div>
+                </div>
+                <div class="view-field">
+                  <label class="mat-body-strong">Payee</label>
+                  <div class="mat-body">{{ payment.bankTransferInfo.payeeName }}
+                    ({{ payment.bankTransferInfo.payeeIdentityNumber }})</div>
+                </div>
+                <div class="view-field">
+                  <label class="mat-body-strong">Transfered Date</label>
+                  <div class="mat-body">{{ payment.bankTransferInfo.transferedDate | date: 'dd-MM-yyyy' }}</div>
+                </div>
+              </div>
+            </mat-card-content>
+            <mat-divider *ngIf="payment.status === 'Open'"></mat-divider>
+            <mat-card-actions *ngIf="payment.status === 'Open'">
+              <button mat-raised-button color="primary" class="btn-sm" [routerLink]="['/payment/edit/' + payment._id]"
+                [queryParams]="{ callback: '/event-plan/view/' + eventPlan._id, fragment: '9' }"
+                *ngIf="checkButtonIsValid(payment, ['Open'])">Edit</button>
+            </mat-card-actions>
+          </mat-card>
+        </ng-template>
+      </div>
+      <!-- <pre>Payment List: {{ payments | json }}</pre> -->
+    </div>
+  </mat-tab>
+  <!-- Tab6: Cost & Profit -->
+  <mat-tab label="Cost & Profit">
+    <div class="tab-body info-group">
+      <div class="mat-title">Costs Summary</div>
+      <mat-divider></mat-divider>
+      <div class="info-item">
+        <div class="mat-body">Services:</div>
+        <div class="mat-body">{{ eventPlan.services | getTotal: 'unitPrice': 'quantity' | currency: 'RM ' }}</div>
+      </div>
+      <div class="info-item">
+        <div class="mat-body">Facilities:</div>
+        <div class="mat-body">{{ eventPlan.facilities | getTotal: 'unitPrice': 'quantity' | currency: 'RM ' }}</div>
+      </div>
+      <div class="info-item">
+        <div class="mat-body">Stock Items:</div>
+        <div class="mat-body">{{ eventPlan.stockItems | getTotal: 'unitPrice': 'quantity' | currency: 'RM ' }}</div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="info-item">
+        <div class="mat-body-strong">Total Costs:</div>
+        <div class="mat-body-strong">
+          {{ ((eventPlan.services | getTotal: 'unitPrice': 'quantity') + (eventPlan.facilities | getTotal: 'unitPrice': 'quantity') + (eventPlan.stockItems | getTotal: 'unitPrice': 'quantity')) | currency: 'RM ' }}
+        </div>
+      </div>
+      <div class="info-item">
+        <div class="mat-body-strong">Total Profit ({{ eventPlan.markupRate | number: '1.0-2' }}%):</div>
+        <div class="mat-body-strong">
+          {{ ((eventPlan.services | getTotal: 'unitPrice': 'quantity') + (eventPlan.facilities | getTotal: 'unitPrice': 'quantity') + (eventPlan.stockItems | getTotal: 'unitPrice': 'quantity')) * eventPlan.markupRate / 100 | currency: 'RM ' }}
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+      <div class="info-item">
+        <div class="mat-body-strong">Total Price:</div>
+        <div class="mat-body-strong">
+          {{ ((eventPlan.services | getTotal: 'unitPrice': 'quantity') + (eventPlan.facilities | getTotal: 'unitPrice': 'quantity') + (eventPlan.stockItems | getTotal: 'unitPrice': 'quantity')) * ((eventPlan.markupRate / 100) + 1) | currency: 'RM ' }}
+        </div>
+      </div>
+      <mat-divider></mat-divider>
+    </div>
+  </mat-tab>
+</mat-tab-group>
+
+<!-- <pre>{{ eventPlan | json }}</pre> -->

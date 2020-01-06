@@ -1,0 +1,141 @@
+<ng-container [ngSwitch]="field.type" *ngIf="isShow(field)">
+  <mat-form-field *ngSwitchCase="'string'">
+    <input matInput [(ngModel)]="formData[field.name]" [name]="field.name" [placeholder]="field.displayName"
+      [required]="field.required" />
+  </mat-form-field>
+
+  <mat-form-field *ngSwitchCase="'textarea'">
+    <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="4" rows="4" [(ngModel)]="formData[field.name]" [name]="field.name" [placeholder]="field.displayName"
+      [required]="field.required"></textarea>
+  </mat-form-field>
+
+  <mat-form-field *ngSwitchCase="'textarea-autocomplete'">
+    <textarea matInput cdkTextareaAutosize cdkAutosizeMinRows="4" rows="4" [(ngModel)]="formData[field.name]" [name]="field.name" [placeholder]="field.displayName"
+      [required]="field.required" [matAutocomplete]="textareaAutocomplete"></textarea>
+
+    <mat-autocomplete #textareaAutocomplete="matAutocomplete" [displayWith]="displayFn"
+      (optionSelected)="field.refChange && field.refChange($event, formData)">
+      <mat-option *ngFor="let option of (field.refOptions | filterOptions: formData[field.name]: field.refName)"
+        [value]="option">{{ displayValue(option, field.refName) }}</mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <mat-form-field *ngSwitchCase="'number'">
+    <input matInput [(ngModel)]="formData[field.name]" [name]="field.name" [placeholder]="field.displayName"
+      [required]="field.required" [max]="getInputMaxValue(field.max, formData)" (keyup)="getInputMaxValue(field.max, formData) && checkInputValid(getInputMaxValue(field.max, formData), $event.target)" />
+    <!-- <pre>MAX: {{getInputMaxValue(field.max, formData)}}</pre> -->
+  </mat-form-field>
+
+  <div *ngSwitchCase="'boolean'">
+    <mat-checkbox [(ngModel)]="formData[field.name]" [name]="field.name">{{ field.displayName }}</mat-checkbox>
+  </div>
+
+  <div *ngSwitchCase="'date'">
+    <mat-form-field>
+      <input matInput [matDatepicker]="datepicker" [(ngModel)]="formData[field.name]" [placeholder]="field.displayName"
+        class="date" disabled />
+      <mat-datepicker-toggle matSuffix [for]="datepicker"></mat-datepicker-toggle>
+      <mat-datepicker #datepicker disabled="false"></mat-datepicker>
+    </mat-form-field>
+  </div>
+
+  <div *ngSwitchCase="'time'">
+    <mat-form-field>
+      <input matInput [(ngModel)]="selectedTime" [placeholder]="field.displayName" (change)="onUpdateTimeData()"
+        [required]="field.required" type="time" class="time" />
+    </mat-form-field>
+  </div>
+
+  <mat-form-field *ngSwitchCase="'enum'">
+    <mat-label>{{ field.displayName }}</mat-label>
+    <mat-select [(ngModel)]="formData[field.name]" [name]="field.name" [required]="field.required">
+      <mat-option *ngFor="let enum of field.enumList" [value]="enum.value">{{ enum.value | titleDisplay }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+
+  <mat-form-field *ngSwitchCase="'ref'">
+    <input type="text" matInput [(ngModel)]="formData[field.name]" [name]="field.name" [placeholder]="field.displayName"
+      [required]="field.required" [matAutocomplete]="textboxAutocomplete" />
+
+    <mat-autocomplete #textboxAutocomplete="matAutocomplete" [displayWith]="displayFn"
+      (optionSelected)="field.refChange && field.refChange($event, formData)">
+      <mat-option *ngFor="let option of getRefOptions(field.refOptions, field.filterOption) | filterOptions: formData[field.name]: field.refName" [value]="option">{{ displayValue(option, field.refName) }}</mat-option>
+    </mat-autocomplete>
+  </mat-form-field>
+
+  <div *ngSwitchCase="'object'">
+    <mat-list>
+      <mat-list-item>{{ field.displayName }}</mat-list-item>
+      <mat-divider></mat-divider>
+    </mat-list>
+    <div *ngFor="let objectField of field.fields">
+      <app-standard-form-field [parentField]="field" [field]="objectField" [(formData)]="formData[field.name]">
+      </app-standard-form-field>
+    </div>
+  </div>
+
+  <div class="form-field-array" *ngSwitchCase="'array'">
+    <mat-list>
+      <mat-list-item>{{ field.displayName }}
+        <button type="button" mat-icon-button [matTooltip]="'Add New ' + field.childName" matTooltipPosition="above"
+          color="primary" (click)="onAddItemInArray(formData[field.name])">
+          <mat-icon>add</mat-icon>
+        </button>
+      </mat-list-item>
+      <mat-divider></mat-divider>
+    </mat-list>
+    <div *ngFor="let item of formData[field.name]; let i = index">
+      <b>{{ field.childName + ' ' + (i + 1) }}</b>
+      <app-standard-form-field [field]="objectField" [(formData)]="item" [parentField]="field"
+        *ngFor="let objectField of field.fields"></app-standard-form-field>
+    </div>
+  </div>
+
+  <div class="form-field-table" *ngSwitchCase="'table'">
+    <h4>
+      <span>{{ field.displayName }}</span>
+      <button type="button" mat-icon-button matTooltip="Add" matTooltipPosition="above"
+        (click)="onAddItemInArray(formData[field.name])">
+        <mat-icon class="icon-xs">add</mat-icon>
+      </button>
+    </h4>
+    <table class="mat-elevation-z2 standard-table">
+      <thead>
+        <tr>
+          <th *ngFor="let col of field.fields">{{ col.displayName }}</th>
+          <th>Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of formData[field.name]; let i = index">
+          <td *ngFor="let col of field.fields">
+            <app-standard-form-field [field]="col" [(formData)]="item" [parentField]="field"></app-standard-form-field>
+          </td>
+          <td>
+            <div class="btn-group">
+              <button type="button" mat-icon-button matTooltip="Remove" matTooltipPosition="above" color="warn"
+                (click)="onRemoveItemFromArray(formData[field.name], i)">
+                <mat-icon class="icon-xs">delete</mat-icon>
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div *ngSwitchCase="'image'">
+    <label for="">{{ field.displayName }}</label>
+    <div class="image-picker">
+      <button mat-stroked-button type="button" (click)="filePicker.click()">
+        <mat-icon>photo</mat-icon> Upload {{ field.displayName }}
+      </button>
+      <input type="file" class="input-file" #filePicker (change)="onImagePicked($event, field.name)" />
+    </div>
+
+    <div class="image-preview" *ngIf="(imagePreview !== '' && imagePreview) || formData[field.name]">
+      <img [src]="imagePreview" *ngIf="imagePreview !== '' && imagePreview" />
+      <img [src]="formData[field.name]" *ngIf="formData[field.name] && !imagePreview" />
+    </div>
+  </div>
+</ng-container>

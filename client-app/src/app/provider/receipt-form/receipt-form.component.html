@@ -1,0 +1,11 @@
+<app-standard-form
+    title="Receipt"
+    domainName="receipt"
+    [fields]="fields"
+    [includes]="includes"
+    [(dataSource)]="formData"
+    (afterSubmit)="afterSubmit($event)"
+>
+</app-standard-form>
+
+<!-- <pre>{{ formData | json }}</pre> -->

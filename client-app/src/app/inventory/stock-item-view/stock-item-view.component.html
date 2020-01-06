@@ -1,0 +1,13 @@
+<mat-card>
+  <mat-card-header>
+    <mat-card-title>View Stock Item</mat-card-title>
+  </mat-card-header>
+  <mat-card-content>
+    <app-standard-display-field [field]="displayField" [formData]="stockItem" *ngFor="let displayField of displayFields">
+    </app-standard-display-field>
+  </mat-card-content>
+</mat-card>
+<!-- <h1>Stock Item</h1>
+<pre>{{ stockItem | json }}</pre>
+<h1>Stock Transactions</h1>
+<pre>{{ stockTransactions | json }}</pre> -->

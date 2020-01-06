@@ -1,0 +1,156 @@
+/* You can add global styles to this file, and also import other style files */
+
+html,
+body {
+    height: 100%;
+}
+body {
+    margin: 0;
+    font-family: Roboto, 'Helvetica Neue', sans-serif;
+}
+table {
+    width: 100%;
+}
+
+.mat-icon.icon-xs {
+    font-size: 1.3rem;
+}
+
+.mat-icon.icon-md {
+    font-size: 1.5rem;
+}
+
+.mat-icon.icon-lg {
+    font-size: 1.7rem;
+}
+
+.mat-card[class*='card-'] {
+    margin: 0 auto;
+}
+
+.mat-card.card-xs {
+    max-width: 576px;
+}
+
+.mat-card.card-sm {
+    max-width: 768px;
+}
+
+.mat-card.card-md {
+    max-width: 992px;
+}
+
+.mat-card.card-lg {
+    max-width: 1200px;
+}
+
+.mat-dialog-container mat-form-field,
+.mat-card[class*='card-'] mat-form-field,
+.form mat-form-field {
+    width: 100%;
+}
+
+.action-group {
+    padding: 10px 0;
+}
+
+.standard-filter {
+    margin: 10px;
+}
+
+.standard-filter .mat-form-field {
+    padding: 0 5px;
+}
+
+.standard-table.mat-table .mat-column-audit-updatedDate {
+    width: 150px;
+}
+
+.standard-table.mat-table .mat-column-action {
+    width: 100px;
+}
+
+.standard-table.mat-table .mat-column-action button {
+    padding: 0 8px;
+    margin: 0 5px;
+}
+
+.standard-table.mat-table .mat-column-action button .mat-icon {
+    vertical-align: middle !important;
+}
+
+.standard-table th.mat-sort-header-sorted {
+    color: black;
+}
+
+.standard-table .number-form-fields {
+    display: inline-block;
+}
+
+.standard-table .mat-paginator {
+    margin-top: 1rem;
+}
+
+.standard-table .mat-column-select {
+    width: 50px;
+}
+
+.standard-table .mat-column-audit-updatedDate {
+    width: 150px;
+}
+
+.standard-table .mat-column-action {
+    width: 200px;
+    text-align: center;
+}
+
+.standard-table .mat-column-action button {
+    padding: 0 8px;
+    margin: 0 5px;
+}
+
+.standard-table a:hover {
+    cursor: pointer;
+}
+
+.image-wrapper .input-file {
+    visibility: hidden;
+}
+
+.image-wrapper .image-picker {
+    margin: 1rem 0;
+}
+
+.image-wrapper .image-preview {
+    height: 5rem;
+    margin: 1rem 0;
+}
+
+.image-wrapper .image-preview img {
+    height: 100%;
+}
+
+.action-group > .mat-raised-button {
+    margin: 0 5px;
+}
+
+.view-page .mat-expansion-panel {
+    margin-bottom: 10px;
+}
+
+.view-page .bg-primary,
+.view-page .bg-primary.mat-expanded:hover,
+.view-page .bg-primary.mat-expanded:focus,
+.view-page .mat-expansion-panel:not(.mat-expanded) .bg-primary,
+.view-page .mat-expansion-panel:not(.mat-expanded) .bg-primary:hover {
+    background-color: #007bff;
+}
+
+.view-page .bg-primary .mat-expansion-panel-header-title,
+.view-page .bg-primary .mat-expansion-indicator:after {
+    color: #fff;
+}
+
+.view-page .view-field span {
+    font-weight: normal;
+}

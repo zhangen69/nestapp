@@ -1,0 +1,193 @@
+<div class="mat-display-1">View Provider <span *ngIf="provider._id">- {{ provider.name }}</span></div>
+
+<mat-tab-group [selectedIndex]="selectedTabIndex" *ngIf="provider._id">
+  <mat-tab label="Basic Information">
+    <mat-card>
+      <mat-card-content>
+        <app-standard-display-field [field]="displayField" [formData]="provider"
+          *ngFor="let displayField of providerDisplayFields"></app-standard-display-field>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Person In Charged">
+    <mat-card *ngFor="let person of provider.personInCharged; let i = index">
+      <mat-card-content>
+        <div class="mat-body-strong">Person {{ i + 1 }}</div>
+        <app-standard-display-field [field]="displayField" [formData]="person"
+          *ngFor="let displayField of personInChargedDisplayFields">
+        </app-standard-display-field>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Services">
+    <h1>Services</h1>
+    
+    <button mat-raised-button color="primary" type="button" [routerLink]="['/provider-service/add']" [queryParams]="{ provider: provider._id }" [queryParams]="{ callback: '/provider/view/' + provider._id, fragment: 2 }">New Service</button>
+
+    <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Unit</th>
+            <th>Unit Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let line of providerServices">
+            <td>{{ line.name }}</td>
+            <td>{{ line.unit }}</td>
+            <td>{{ line.unitPrice | currency: 'MYR ' }}</td>
+            <td>
+              <button mat-raised-button color="primary" type="button" [routerLink]="['/provider-service/edit/' + line._id ]" [queryParams]="{ callback: '/provider/view/' + provider._id, fragment: 2 }">Edit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    <!-- <pre>{{ providerServices | json }}</pre> -->
+  </mat-tab>
+
+  <mat-tab label="Facilities">
+
+    <button mat-raised-button color="primary" type="button" [routerLink]="['/provider-facility/add']" [queryParams]="{ provider: provider._id }" [queryParams]="{ callback: '/provider/view/' + provider._id, fragment: 3 }">New Facility</button>
+
+    <table class="table table-bordered">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Unit</th>
+            <th>Unit Price</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let line of providerFacilities">
+            <td>{{ line.name }}</td>
+            <td>{{ line.unit }}</td>
+            <td>{{ line.unitPrice | currency: 'MYR ' }}</td>
+            <td>
+              <button mat-raised-button color="primary" type="button" [routerLink]="['/provider-facility/edit/' + line._id ]" [queryParams]="{ callback: '/provider/view/' + provider._id, fragment: 3 }">Edit</button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    <!-- <pre>{{ providerFacilities | json }}</pre> -->
+  </mat-tab>
+
+  <mat-tab label="Supplier Inoivces">
+
+    <button mat-raised-button color="primary" type="button" [routerLink]="['/supplier-invoice/add']" [queryParams]="{ provider: provider._id }" [queryParams]="{ callback: '/provider/view/' + provider._id, fragment: 4 }">New Supplier Invoice</button>
+
+      <mat-card *ngFor="let invoice of supplierInvoices">
+        <mat-card-content>
+          <app-standard-display-field [field]="displayField" [formData]="invoice"
+            *ngFor="let displayField of supplierInvoiceDisplayFields"></app-standard-display-field>
+
+          <table class="table table-bordered">
+            <thead>
+              <tr>
+                <th>Name</th>
+                <th>Unit</th>
+                <th>Unit Price</th>
+                <th>Quantity</th>
+                <th>Sub Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let line of invoice.lines">
+                <td>{{ line.name }}</td>
+                <td>{{ line.unit }}</td>
+                <td>{{ line.unitPrice | currency: 'MYR ' }}</td>
+                <td>{{ line.quantity }}</td>
+                <td>{{ (line.quantity * line.unitPrice) | currency: 'MYR ' }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </mat-card-content>
+      </mat-card>
+    <!-- <pre>{{ supplierInvoices | json }}</pre> -->
+  </mat-tab>
+
+  <mat-tab label="Payment Vouchers">
+      <mat-card *ngFor="let paymentVoucher of paymentVouchers">
+        <mat-card-content>
+          <app-standard-display-field [field]="displayField" [formData]="paymentVoucher"
+            *ngFor="let displayField of paymentVoucherDisplayFields"></app-standard-display-field>
+
+            <div *ngIf="paymentVoucher.paymentType === 'Cheque'">
+              <div class="mat-h3">Cheque Details</div>
+              <div class="view-field">
+                <label class="mat-body-strong">Reference No.</label>
+                <div class="mat-body">{{ paymentVoucher.chequeInfo.referenceNumber }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Payee</label>
+                <div class="mat-body">{{ paymentVoucher.chequeInfo.payeeName }}
+                  ({{ paymentVoucher.chequeInfo.payeeIdentityNumber }})</div>
+              </div>
+              <!-- <div class="view-field">
+                <label class="mat-body-strong">Drawee</label>
+                <div class="mat-body">{{ paymentVoucher.chequeInfo.draweeName }}
+                  ({{ paymentVoucher.chequeInfo.draweeIdentityNumber }})</div>
+              </div> -->
+              <div class="view-field">
+                <label class="mat-body-strong">Issued Date</label>
+                <div class="mat-body">{{ paymentVoucher.chequeInfo.issuedDate | date: 'dd-MM-yyyy' }}</div>
+              </div>
+            </div>
+            <div *ngIf="paymentVoucher.paymentType === 'BankTransfer'">
+                <div class="mat-h3">Bank Transfer Details</div>
+              <div class="view-field">
+                <label class="mat-body-strong">Reference No.</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.referenceNumber }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Bank</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.bank }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Account Number</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.accountNumber }}</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Payee</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.payeeName }}
+                  ({{ paymentVoucher.bankTransferInfo.payeeIdentityNumber }})</div>
+              </div>
+              <div class="view-field">
+                <label class="mat-body-strong">Transfered Date</label>
+                <div class="mat-body">{{ paymentVoucher.bankTransferInfo.transferedDate | date: 'dd-MM-yyyy' }}</div>
+              </div>
+            </div>
+            <div class="view-field" *ngIf="paymentVoucher.remarks">
+              <label class="mat-body-strong">Remarks</label>
+              <div class="mat-body">{{ paymentVoucher.remarks }}</div>
+            </div>
+
+            <table class="table table-bordered payment-vouchers">
+                <thead>
+                  <tr>
+                    <th>Name</th>
+                    <th>Unit</th>
+                    <th>Unit Price</th>
+                    <th>Quantity</th>
+                    <th>Sub Total</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr *ngFor="let line of paymentVoucher.lines">
+                    <td>{{ line.name }}</td>
+                    <td>{{ line.unit }}</td>
+                    <td>{{ line.unitPrice }}</td>
+                    <td>{{ line.quantity }}</td>
+                    <td>{{ (line.unitPrice * line.quantity) | currency: 'MYR ' }}</td>
+                  </tr>
+                </tbody>
+              </table>
+        </mat-card-content>
+      </mat-card>
+    <!-- <pre>{{ paymentVouchers | json }}</pre> -->
+  </mat-tab>
+</mat-tab-group>

@@ -1,0 +1,17 @@
+{
+  "hosting": [
+    {
+      "app": {
+        "project": "ng-app",
+        "target": "build",
+        "configuration": "production",
+        "path": "../webpack-dist/ng-app"
+      },
+      "azureHosting": {
+        "subscription": "bc387a82-9e76-4b7c-aabd-4aefb323e67f",
+        "resourceGroupName": "ng-app-static-deploy",
+        "account": "ngappstatic"
+      }
+    }
+  ]
+}

@@ -1,0 +1,30 @@
+<div fxLayout fxLayoutAlign="start center" fxLayoutGap="10px" class="standard-filter">
+  <mat-form-field *ngIf="selectedFilter?.queryType === 'string'">
+    <input matInput [(ngModel)]="queryModel.searchText" (keyup)="$event.keyCode === 13 && applyFilter(queryModel)"
+      placeholder="Filter">
+  </mat-form-field>
+  <div class="number-form-fields" *ngIf="selectedFilter?.queryType === 'number'">
+    <mat-form-field>
+      <input matInput [(ngModel)]="queryModel.min" (keyup)="$event.keyCode === 13 && applyFilter()"
+        placeholder="Min">
+    </mat-form-field>
+    <mat-form-field>
+      <input matInput [(ngModel)]="queryModel.max" (keyup)="$event.keyCode === 13 && applyFilter()"
+        placeholder="Max">
+    </mat-form-field>
+  </div>
+  <mat-form-field>
+    <mat-label>Type</mat-label>
+    <mat-select [(ngModel)]="selectedFilter" (valueChange)="onChangeFilter($event)">
+      <mat-option *ngFor="let item of filterList" [value]="item">{{ item.displayName }}</mat-option>
+    </mat-select>
+  </mat-form-field>
+  <button mat-raised-button matTooltip="Search" matTooltipPosition="above" type="button" color="primary"
+    (click)="applyFilter()">
+    <mat-icon>search</mat-icon>
+  </button>
+  <button fxFlexOffset="auto" mat-raised-button matTooltip="Refresh" matTooltipPosition="above" type="button"
+    color="primary" (click)="applyFilter()">
+    <mat-icon>refresh</mat-icon>
+  </button>
+</div>

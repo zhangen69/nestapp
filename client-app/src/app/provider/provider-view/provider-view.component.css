@@ -1,0 +1,35 @@
+mat-card {
+  margin-bottom: 15px;
+}
+
+mat-card table {
+  margin: 15px 0;
+}
+
+.table.table-bordered {
+  border: 1px #eee solid;
+  margin-top: 10px;
+}
+
+.table td,
+.table th {
+  text-align: center;
+  border-bottom: 1px #eee solid;
+  padding: 10px;
+}
+
+.table.supplier-invoices td,
+.table.supplier-invoices th,
+.table.payment-vouchers td,
+.table.payment-vouchers th {
+  text-align-last: left;
+}
+
+.table.table-bordered tr:hover {
+  background-color: #ededed;
+  cursor: pointer;
+}
+
+.mat-display-1 {
+  margin-bottom: 0;
+}

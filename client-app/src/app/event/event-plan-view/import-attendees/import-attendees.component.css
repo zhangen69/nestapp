@@ -1,0 +1,23 @@
+.header{
+  margin: 15px 0;
+}
+
+.hidden {
+  display: none;
+}
+
+.table.table-bordered {
+  border: 1px #eee solid;
+  margin: 10px 0;
+}
+
+.table td,
+.table th {
+  text-align: center;
+  border-bottom: 1px #eee solid;
+  padding: 10px;
+}
+
+.btn-group > button {
+  margin-left: 5px;
+}

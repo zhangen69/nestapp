@@ -1,0 +1,26 @@
+<mat-card class="card-md">
+    <mat-card-header>
+        <mat-card-title>{{ formData._id ? 'Edit' : 'New' }} {{ title }}</mat-card-title>
+        <mat-card-subtitle>Please fill-in all the required fields marked with asterisks (*).</mat-card-subtitle>
+    </mat-card-header>
+    <mat-card-content>
+        <form #form="ngForm" id="form" (ngSubmit)="form.valid && onSubmit()">
+            <app-standard-form-field form="form" [field]="field" [(formData)]="formData" *ngFor="let field of fields">
+            </app-standard-form-field>
+            <div class="form-actions-group">
+                <button mat-raised-button type="button" (click)="onCancel('/' + domainName + '/list')">
+                    <mat-icon>arrow_back_ios</mat-icon> Cancel
+                </button>
+                <button mat-raised-button color="primary" type="submit"><mat-icon>done</mat-icon> Submit</button>
+            </div>
+        </form>
+    </mat-card-content>
+    <!-- <mat-card-actions>
+    <button mat-raised-button type="button" (click)="onCancel('/' + domainName + '/list')">
+      <mat-icon>arrow_back_ios</mat-icon> Cancel
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="form.ngSubmit.emit()">
+      <mat-icon>done</mat-icon> Submit
+    </button>
+  </mat-card-actions> -->
+</mat-card>

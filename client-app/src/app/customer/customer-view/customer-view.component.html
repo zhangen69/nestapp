@@ -1,0 +1,56 @@
+<div class="mat-display-1">View Customer <span *ngIf="customer._id">{{ customer.name }}</span></div>
+
+<mat-tab-group *ngIf="customer._id">
+  <mat-tab label="Basic Information">
+    <mat-card>
+      <mat-card-content>
+        <app-standard-display-field [field]="displayField" [formData]="customer" *ngFor="let displayField of customerDisplayFields"></app-standard-display-field>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Person In Charged" *ngIf="customer?.personInCharged">
+    <mat-card *ngFor="let person of customer.personInCharged; let i = index">
+      <mat-card-content>
+        <div class="mat-body-strong">Person {{ i + 1 }}</div>
+        <app-standard-display-field [field]="{ name: 'name', displayName: 'Name' }" [formData]="person">
+        </app-standard-display-field>
+        <app-standard-display-field [field]="{ name: 'email', displayName: 'Email' }" [formData]="person">
+        </app-standard-display-field>
+        <app-standard-display-field [field]="{ name: 'jobTitle', displayName: 'Job Title' }" [formData]="person">
+        </app-standard-display-field>
+      </mat-card-content>
+    </mat-card>
+  </mat-tab>
+
+  <mat-tab label="Invoices">
+    <mat-card *ngFor="let invoice of invoices">
+      <mat-card-content>
+        <app-standard-display-field [field]="displayField" [formData]="invoice"
+          *ngFor="let displayField of invoiceDisplayFields"></app-standard-display-field>
+
+        <table class="table table-bordered">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Unit</th>
+              <th>Unit Price</th>
+              <th>Quantity</th>
+              <th>Sub Total</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let line of invoice.lines">
+              <td>{{ line.name }}</td>
+              <td>{{ line.unit }}</td>
+              <td>{{ line.unitPrice | currency: 'MYR ' }}</td>
+              <td>{{ line.quantity }}</td>
+              <td>{{ (line.quantity * line.unitPrice) | currency: 'MYR ' }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </mat-card-content>
+    </mat-card>
+    <!-- <pre>{{ invoices | json }}</pre> -->
+  </mat-tab>
+</mat-tab-group>

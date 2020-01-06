@@ -1,0 +1,7 @@
+.form-actions-group > button {
+  margin: 0 8px;
+}
+
+.form-actions-group > button:nth-of-type(1) {
+  margin: 0;
+}

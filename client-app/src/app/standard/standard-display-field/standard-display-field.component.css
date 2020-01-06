@@ -1,0 +1,8 @@
+.view-field {
+  margin-top: 10px;
+  margin-bottom: 5px;
+}
+
+.view-field .mat-body {
+  white-space: pre;
+}

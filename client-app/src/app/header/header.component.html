@@ -1,0 +1,12 @@
+<mat-toolbar color="primary">
+  <button mat-icon-button (click)="navToggle.emit()" *ngIf="isAuth">
+    <mat-icon>menu</mat-icon>
+  </button>
+
+  <span class="logo" routerLink="/">EvtOrg-MS</span>
+
+  <ng-container *ngIf="!isAuth">
+    <a routerLink="/auth/login" mat-button *ngIf="!isAuth">Login</a>
+    <!-- <a routerLink="/auth/register" mat-button *ngIf="!isAuth">Sign Up</a> -->
+  </ng-container>
+</mat-toolbar>

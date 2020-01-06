@@ -1,0 +1,19 @@
+<ng-container [ngSwitch]="field.type">
+  <div class="mat-h1" *ngSwitchCase="'title'">{{ getDisplayValue(field, formData) }}</div>
+  <div class="view-field" *ngSwitchCase="'link'">
+    <label class="mat-body-strong" *ngIf="!field.noLabel">{{ field.displayName }}</label>
+    <div class="mat-body">
+      <a [routerLink]="[field.link(formData)]">{{ getDisplayValue(field, formData) }}</a>
+    </div>
+  </div>
+  
+  <div class="view-field" *ngSwitchCase="'currency'">
+    <label class="mat-body-strong" *ngIf="!field.noLabel">{{ field.displayName }}</label>
+    <div class="mat-body">{{ getDisplayValue(field, formData) | currency: 'MYR ' }}</div>
+  </div>
+
+  <div class="view-field" *ngSwitchDefault>
+    <label class="mat-body-strong" *ngIf="!field.noLabel">{{ field.displayName }}</label>
+    <div class="mat-body">{{ getDisplayValue(field, formData) }}</div>
+  </div>
+</ng-container>
