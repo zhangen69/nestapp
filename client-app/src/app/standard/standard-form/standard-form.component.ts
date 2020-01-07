@@ -1,3 +1,4 @@
+import { StandardFormService } from './../standard-form.service';
 import { environment } from 'src/environments/environment';
 import { Title } from '@angular/platform-browser';
 import { HttpClient } from '@angular/common/http';
@@ -9,6 +10,7 @@ import { Location } from '@angular/common';
 import { PageLoaderService } from 'src/app/templates/page-loader/page-loader.service';
 import * as moment from 'moment';
 import { MatDialog } from '@angular/material/dialog';
+import { FormGroup } from '@angular/forms';
 
 @Component({
   selector: 'app-standard-form',
@@ -25,6 +27,7 @@ export class StandardFormComponent implements OnInit {
   @Output() cancel = new EventEmitter<any>();
   @Output() submitFunc = new EventEmitter<any>();
   @Output() afterSubmit = new EventEmitter<any>();
+  form: FormGroup;
 
   mode = 'create';
   formData: any = {};
@@ -41,12 +44,16 @@ export class StandardFormComponent implements OnInit {
     private pageLoaderService: PageLoaderService,
     private http: HttpClient,
     private dialog: MatDialog,
-    private titleService: Title
+    private titleService: Title,
+    private standardFormService: StandardFormService
   ) {
     this.standardService = new StandardService(this.http, this.dialog, this.router, this.toastr);
   }
 
   ngOnInit() {
+    // demo
+    this.form = this.standardFormService.toFormGroup(this.fields);
+    // demo
     if (this.title) {
       this.titleService.setTitle('New ' + this.title + ' - ' + environment.title);
     }
@@ -135,6 +142,8 @@ export class StandardFormComponent implements OnInit {
   }
 
   onSubmit() {
+    console.log('submitting');
+    return;
     if (this.pickedImage !== null) {
       this.onUploadFile();
     } else if (this.callback && this.submitFunc.observers.length > 0) {

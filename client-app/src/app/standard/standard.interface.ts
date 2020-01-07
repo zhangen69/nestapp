@@ -1,6 +1,6 @@
 export interface IStandardFormField {
   name: string;
-  type: string;
+  type: 'string' | 'textarea' | 'textarea-autocomplete' | 'number' | 'boolean' | 'date' | 'time' | 'enum' | 'ref' | 'object' | 'array' | 'table' | 'image' | 'password';
   displayName?: string;
   required?: boolean;
   childName?: string;

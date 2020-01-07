@@ -1,3 +1,6 @@
+import { StandardModule } from './../standard/standard.module';
+import { MatInputModule } from '@angular/material/input';
+import { MatButtonModule } from '@angular/material/button';
 import { MatPaginatorModule } from '@angular/material/paginator';
 import { MatTooltipModule } from '@angular/material/tooltip';
 import { MatTableModule } from '@angular/material/table';
@@ -29,12 +32,15 @@ import { DisableControlDirective } from '../directives/disable-control.directive
     FormsModule,
     ReactiveFormsModule,
     RouterModule,
+    StandardModule,
     MatCardModule,
     MatFormFieldModule,
     MatIconModule,
     MatTableModule,
     MatTooltipModule,
     MatPaginatorModule,
+    MatButtonModule,
+    MatInputModule,
   ]
 })
 export class UserModule { }

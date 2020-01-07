@@ -1,3 +1,4 @@
+import { IStandardFormField } from 'src/app/standard/standard.interface';
 import { HttpClient } from '@angular/common/http';
 import { TitleDisplayPipe } from './../../pipes/title-display.pipe';
 import { Component, OnInit, Input, OnDestroy } from '@angular/core';
@@ -5,6 +6,7 @@ import { ToastrService } from 'ngx-toastr';
 import { environment } from 'src/environments/environment';
 import { Observable, Subscription } from 'rxjs';
 import { map, throttleTime } from 'rxjs/operators';
+import { FormGroup } from '@angular/forms';
 
 interface IFieldOptions {
   name: string;
@@ -141,6 +143,12 @@ export class StandardFormFieldComponent implements OnInit {
   imagePreview: string;
   pickedImage: any = null;
   selectedTime: string;
+  // demo
+  @Input() formField: IStandardFormField;
+  @Input() form: FormGroup;
+  get isValid() { return this.form.controls[this.formField.name].valid; }
+  get isTouched() { return this.form.controls[this.formField.name].touched; }
+  // demo
 
   constructor(private toastr: ToastrService, private titleDisplayPipe: TitleDisplayPipe, private http: HttpClient) {}
 

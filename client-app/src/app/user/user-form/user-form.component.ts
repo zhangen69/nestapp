@@ -1,3 +1,4 @@
+import { IStandardFormField } from 'src/app/standard/standard.interface';
 import { ToastrService } from 'ngx-toastr';
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, Params } from '@angular/router';
@@ -22,6 +23,13 @@ export class UserFormComponent implements OnInit {
     signatureImageUrl: [''],
   });
   imagesPreview: any = {};
+  userFormFiels: IStandardFormField[] = [
+    { name: 'username', type: 'string', displayName: 'User Name', required: true },
+    { name: 'password', type: 'password', required: true },
+    { name: 'displayName', type: 'string', required: true },
+    { name: 'email', type: 'string', required: true },
+    { name: 'phoneNumber', type: 'string', required: true },
+  ];
 
   constructor(
     private route: ActivatedRoute,

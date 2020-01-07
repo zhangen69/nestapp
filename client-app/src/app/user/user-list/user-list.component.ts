@@ -35,7 +35,7 @@ export class UserListComponent implements OnInit, AfterViewInit {
   }
 
   ngOnInit() {
-    this.fetchAll();
+    // this.fetchAll();
   }
 
   ngAfterViewInit() {

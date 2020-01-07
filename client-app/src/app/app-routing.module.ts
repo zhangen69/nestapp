@@ -13,7 +13,7 @@ import { ResetPasswordComponent } from './auth/reset-password/reset-password.com
 const routes: Routes = [
   {
     path: 'user',
-    canActivate: [AuthGuard],
+    // canActivate: [AuthGuard],
     children: [
       { path: 'list', component: UserListComponent },
       { path: 'add', component: UserFormComponent },

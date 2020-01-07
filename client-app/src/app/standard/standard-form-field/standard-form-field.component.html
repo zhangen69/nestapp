@@ -1,7 +1,12 @@
-<ng-container [ngSwitch]="field.type" *ngIf="isShow(field)">
+<!-- <ng-container [ngSwitch]="field.type" *ngIf="isShow(field)">
   <mat-form-field *ngSwitchCase="'string'">
     <input matInput [(ngModel)]="formData[field.name]" [name]="field.name" [placeholder]="field.displayName"
       [required]="field.required" />
+  </mat-form-field>
+
+  <mat-form-field *ngSwitchCase="'password'">
+    <input matInput [(ngModel)]="formData[field.name]" [name]="field.name" [placeholder]="field.displayName"
+      [required]="field.required" type="password" />
   </mat-form-field>
 
   <mat-form-field *ngSwitchCase="'textarea'">
@@ -23,7 +28,6 @@
   <mat-form-field *ngSwitchCase="'number'">
     <input matInput [(ngModel)]="formData[field.name]" [name]="field.name" [placeholder]="field.displayName"
       [required]="field.required" [max]="getInputMaxValue(field.max, formData)" (keyup)="getInputMaxValue(field.max, formData) && checkInputValid(getInputMaxValue(field.max, formData), $event.target)" />
-    <!-- <pre>MAX: {{getInputMaxValue(field.max, formData)}}</pre> -->
   </mat-form-field>
 
   <div *ngSwitchCase="'boolean'">
@@ -138,4 +142,23 @@
       <img [src]="formData[field.name]" *ngIf="formData[field.name] && !imagePreview" />
     </div>
   </div>
-</ng-container>
+</ng-container> -->
+<div [formGroup]="form">
+  <label [attr.for]="formField.name">{{formField.displayName}}</label>
+
+  <div [ngSwitch]="formField.type">
+
+    <mat-form-field *ngSwitchCase="'string'">
+      <input matInput [formControlName]="formField.name" [name]="field.name" [id]="formField.name" [placeholder]="field.displayName"
+        [required]="field.required" type="text" />
+    </mat-form-field>
+
+    <mat-form-field *ngSwitchCase="'password'">
+      <input matInput [formControlName]="formField.name" [id]="formField.name" [name]="field.name" [placeholder]="field.displayName"
+        [required]="field.required" type="password" />
+    </mat-form-field>
+
+  </div>
+
+  <div class="errorMessage" *ngIf="!isValid && isTouched">{{formField.displayName}} is required</div>
+</div>
