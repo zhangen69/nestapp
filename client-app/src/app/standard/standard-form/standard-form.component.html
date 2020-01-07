@@ -1,6 +1,6 @@
 <mat-card class="card-md">
     <mat-card-header>
-        <mat-card-title>{{ formData._id ? 'Edit' : 'New' }} {{ title }}</mat-card-title>
+        <mat-card-title>{{ title ? title : (formData._id ? 'Edit' : 'New') }}</mat-card-title>
         <mat-card-subtitle>Please fill-in all the required fields marked with asterisks (*).</mat-card-subtitle>
     </mat-card-header>
     <mat-card-content>

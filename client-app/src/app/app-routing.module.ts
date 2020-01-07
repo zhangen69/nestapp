@@ -1,3 +1,4 @@
+import { RegisterComponent } from './auth/register/register.component';
 import { UserProfileComponent } from './user/user-profile/user-profile.component';
 import { UserChangePasswordComponent } from './user/user-change-password/user-change-password.component';
 import { UserFormComponent } from './user/user-form/user-form.component';
@@ -26,6 +27,7 @@ const routes: Routes = [
     path: 'auth',
     children: [
       { path: 'login', component: LoginComponent },
+      { path: 'register', component: RegisterComponent },
       { path: 'forgotPassword', component: ForgotPasswordComponent },
       { path: 'resetPassword/:token', component: ResetPasswordComponent }
     ]

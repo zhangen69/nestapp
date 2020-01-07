@@ -1,3 +1,4 @@
+import { TitleDisplayPipe } from 'src/app/pipes/title-display.pipe';
 import { StandardFormService } from './../standard-form.service';
 import { environment } from 'src/environments/environment';
 import { Title } from '@angular/platform-browser';
@@ -45,7 +46,8 @@ export class StandardFormComponent implements OnInit {
     private http: HttpClient,
     private dialog: MatDialog,
     private titleService: Title,
-    private standardFormService: StandardFormService
+    private standardFormService: StandardFormService,
+    private titleDisplayPipe: TitleDisplayPipe
   ) {
     this.standardService = new StandardService(this.http, this.dialog, this.router, this.toastr);
   }
@@ -55,7 +57,7 @@ export class StandardFormComponent implements OnInit {
     this.form = this.standardFormService.toFormGroup(this.fields);
     // demo
     if (this.title) {
-      this.titleService.setTitle('New ' + this.title + ' - ' + environment.title);
+      this.titleService.setTitle((this.title ? this.title : (this.formData._id ? 'Edit' : 'New') + ' ' + this.titleDisplayPipe.transform(this.domainName)) + ' - ' + environment.title);
     }
 
     this.formId = 'form_' + moment().format('x');
