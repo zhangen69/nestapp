@@ -20,7 +20,8 @@
     "test:e2e": "jest --config ./test/jest-e2e.json",
     "webpack": "rimraf webpack-dist/server.bundle.js && webpack",
     "start:webpack": "node webpack-dist/server.bundle.js",
-    "deploy": "npm run build && npm run webpack"
+    "deploy": "npm run build && npm run webpack",
+    "dev": "npm run start:dev"
   },
   "dependencies": {
     "@nestjs/common": "^6.7.2",
