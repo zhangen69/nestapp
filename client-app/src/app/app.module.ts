@@ -1,3 +1,11 @@
+import { StandardModule } from './standard/standard.module';
+import { MatToolbarModule } from '@angular/material/toolbar';
+import { MatDialogModule } from '@angular/material/dialog';
+import { MatIconModule } from '@angular/material/icon';
+import { MatSidenavModule } from '@angular/material/sidenav';
+import { UserModule } from './user/user.module';
+import { AuthModule } from './auth/auth.module';
+import { SharedModule } from './shared/shared.module';
 import { StandardDisplayFieldComponent } from './standard/standard-display-field/standard-display-field.component';
 import { MaterialModule } from './material.module';
 import { AuthInterceptor } from './auth/auth.interceptor';
@@ -14,17 +22,9 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { HttpClientModule, HTTP_INTERCEPTORS } from '@angular/common/http';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ConfirmationDialogComponent } from './templates/confirmation-dialog/confirmation-dialog.component';
-import { LoginComponent } from './auth/login/login.component';
-import { RegisterComponent } from './auth/register/register.component';
 import { HeaderComponent } from './header/header.component';
 import { HomeComponent } from './home/home.component';
-import { UserListComponent } from './user/user-list/user-list.component';
-import { UserFormComponent } from './user/user-form/user-form.component';
 import { DisableControlDirective } from './directives/disable-control.directive';
-import { ForgotPasswordComponent } from './auth/forgot-password/forgot-password.component';
-import { UserProfileComponent } from './user/user-profile/user-profile.component';
-import { UserChangePasswordComponent } from './user/user-change-password/user-change-password.component';
-import { ResetPasswordComponent } from './auth/reset-password/reset-password.component';
 import { RoleFormComponent } from './role/role-form/role-form.component';
 import { RoleListComponent } from './role/role-list/role-list.component';
 import { StandardListComponent } from './standard/standard-list/standard-list.component';
@@ -47,35 +47,24 @@ import { StoreDevtoolsModule } from '@ngrx/store-devtools';
 import { FilterOptionsPipe } from './standard/filter-options.pipe';
 import { GetTotalPipe } from './pipes/get-total.pipe';
 import { ObjectToArrayPipe } from './standard/to-array.pipe';
+import { MatListModule } from '@angular/material/list';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatButtonModule } from '@angular/material/button';
 
 @NgModule({
   declarations: [
     AppComponent,
     ConfirmationDialogComponent,
-    LoginComponent,
-    RegisterComponent,
     HeaderComponent,
     HomeComponent,
-    UserListComponent,
-    UserFormComponent,
-    DisableControlDirective,
-    ForgotPasswordComponent,
-    UserProfileComponent,
-    UserChangePasswordComponent,
-    ResetPasswordComponent,
     RoleFormComponent,
     RoleListComponent,
-    StandardListComponent,
-    StandardFormComponent,
-    StandardFormFieldComponent,
-    StandardFilterComponent,
-    TitleDisplayPipe,
+    // TitleDisplayPipe,
     PageLoaderComponent,
     DialogFormComponent,
-    FilterOptionsPipe,
+    // FilterOptionsPipe,
     GetTotalPipe,
     ObjectToArrayPipe,
-    StandardDisplayFieldComponent,
   ],
   imports: [
     CommonModule,
@@ -91,7 +80,7 @@ import { ObjectToArrayPipe } from './standard/to-array.pipe';
       timeOut: 3000,
       positionClass: 'toast-bottom-right'
     }),
-    MaterialModule,
+    // MaterialModule,
     QRCodeModule,
     ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production }),
     EntityDataModule,
@@ -104,6 +93,17 @@ import { ObjectToArrayPipe } from './standard/to-array.pipe';
     }),
     EffectsModule.forRoot([AppEffects]),
     StoreDevtoolsModule.instrument({ maxAge: 25, logOnly: environment.production }),
+    SharedModule,
+    AuthModule,
+    UserModule,
+    StandardModule,
+    MatSidenavModule,
+    MatIconModule,
+    MatListModule,
+    MatDialogModule,
+    MatToolbarModule,
+    MatButtonModule,
+    MatProgressSpinnerModule,
   ],
   entryComponents: [ConfirmationDialogComponent, DialogFormComponent],
   providers: [
