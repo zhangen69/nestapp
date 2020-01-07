@@ -142,8 +142,6 @@ export class StandardFormComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log('submitting');
-    return;
     if (this.pickedImage !== null) {
       this.onUploadFile();
     } else if (this.callback && this.submitFunc.observers.length > 0) {
