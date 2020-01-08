@@ -16,7 +16,7 @@ import { FormGroup } from '@angular/forms';
 @Component({
   selector: 'app-standard-form',
   templateUrl: './standard-form.component.html',
-  styleUrls: ['./standard-form.component.css']
+  styleUrls: ['./standard-form.component.css'],
 })
 export class StandardFormComponent implements OnInit {
   @Input() title: string;
@@ -47,7 +47,7 @@ export class StandardFormComponent implements OnInit {
     private dialog: MatDialog,
     private titleService: Title,
     private standardFormService: StandardFormService,
-    private titleDisplayPipe: TitleDisplayPipe
+    private titleDisplayPipe: TitleDisplayPipe,
   ) {
     this.standardService = new StandardService(this.http, this.dialog, this.router, this.toastr);
   }
@@ -57,7 +57,11 @@ export class StandardFormComponent implements OnInit {
     this.form = this.standardFormService.toFormGroup(this.fields);
     // demo
     if (this.title) {
-      this.titleService.setTitle((this.title ? this.title : (this.formData._id ? 'Edit' : 'New') + ' ' + this.titleDisplayPipe.transform(this.domainName)) + ' - ' + environment.title);
+      this.titleService.setTitle(
+        (this.title ? this.title : (this.formData._id ? 'Edit' : 'New') + ' ' + this.titleDisplayPipe.transform(this.domainName)) +
+          ' - ' +
+          environment.title,
+      );
     }
 
     this.formId = 'form_' + moment().format('x');
@@ -73,13 +77,14 @@ export class StandardFormComponent implements OnInit {
         this.standardService.fetch(params['id'], null, this.includes).subscribe(
           (res: any) => {
             this.formData = res.data;
+            this.form.patchValue(this.formData);
             this.initialDefaultValues();
             this.pageLoaderService.toggle(false);
           },
           (res: any) => {
             this.pageLoaderService.toggle(false);
             this.toastr.error(res.error.message);
-          }
+          },
         );
       }
     });
@@ -91,6 +96,7 @@ export class StandardFormComponent implements OnInit {
     if (this.dataSource) {
       this.mode = 'update';
       this.formData = this.dataSource;
+      this.form.patchValue(this.formData);
     }
   }
 
@@ -144,6 +150,8 @@ export class StandardFormComponent implements OnInit {
   }
 
   onSubmit() {
+    this.formData = this.form.value;
+
     if (this.pickedImage !== null) {
       this.onUploadFile();
     } else if (this.callback && this.submitFunc.observers.length > 0) {
@@ -174,7 +182,7 @@ export class StandardFormComponent implements OnInit {
         (res: any) => {
           this.pageLoaderService.toggle(false);
           this.toastr.error(res.error.message);
-        }
+        },
       );
     }
   }
